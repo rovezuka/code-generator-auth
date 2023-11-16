@@ -95,8 +95,10 @@ def generate_code():
     # Генерируем случайный 4-значный код
     code = ''.join(str(random.randint(0, 9)) for _ in range(4))
 
+    logout_user()
+
     # Передаем сгенерированный код в шаблон
-    return render_template('generate_code.html', username=current_user.username, code=code)
+    return render_template('generate_code.html', code=code)
 
 # Главная страница
 @app.route('/')
