@@ -1,18 +1,10 @@
+from flask import render_template, redirect, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user
+from . import db
+from .models import User
+from .forms import RegistrationForm, LoginForm
+from app import app
 import random
-from flask import Flask, render_template, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
-from flask_migrate import Migrate
-
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 # Конфигурация Flask-Login
 login_manager = LoginManager(app)
@@ -21,23 +13,6 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# Модель пользователя
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
-
-# Формы для регистрации и входа
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
-    submit = SubmitField('Register')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
-    submit = SubmitField('Login')
 
 # Роуты для регистрации, входа и выхода
 @app.route('/register', methods=['GET', 'POST'])
@@ -104,7 +79,3 @@ def generate_code():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
